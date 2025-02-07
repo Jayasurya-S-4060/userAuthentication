@@ -1,7 +1,7 @@
 const User = require("../models/user");
 
 // Create a new recipe
-const createUser = async (req, res) => {
+const userRegister = async (req, res) => {
   try {
     const newUser = new User(req.body);
     await newUser.save();
@@ -32,6 +32,6 @@ const userLogin = async (req, res) => {
 };
 
 module.exports = {
-  createUser,
+  userRegister,
   userLogin,
 };
