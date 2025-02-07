@@ -16,12 +16,10 @@ const userRegister = async (req, res) => {
 
     const { password: _, ...userWithoutPassword } = newUser.toObject();
 
-    return res
-      .status(201)
-      .json({
-        message: "User successfully registered",
-        user: userWithoutPassword,
-      });
+    return res.status(201).json({
+      message: "User successfully registered",
+      user: userWithoutPassword,
+    });
   } catch (err) {
     return res
       .status(500)
@@ -29,35 +27,34 @@ const userRegister = async (req, res) => {
   }
 };
 
-// User login
 const userLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-
     const user = await User.findOne({ email });
+
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
 
-    const isPasswordSame = await bcrypt.compare(password, user.password);
+    const isPasswordSame = bcrypt.compareSync(password, user.password);
     if (!isPasswordSame) {
       return res
         .status(400)
         .json({ message: "Username/password is incorrect" });
     }
 
+    // Generate JWT
     const token = jwt.sign(
       { id: user._id, email: user.email },
-      "your_secret_key",
+      process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
     const { password: _, ...userWithoutPassword } = user.toObject();
-
     res.status(200).json({
       message: "User successfully logged in",
-      token,
       user: userWithoutPassword,
+      token,
     });
   } catch (err) {
     res
@@ -66,7 +63,20 @@ const userLogin = async (req, res) => {
   }
 };
 
+const getUserInfo = async (req, res) => {
+  try {
+    res
+      .status(200)
+      .json({ message: "User info retrieved successfully", user: req.user });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Error fetching user info", error: err.message });
+  }
+};
+
 module.exports = {
   userRegister,
   userLogin,
+  getUserInfo,
 };
