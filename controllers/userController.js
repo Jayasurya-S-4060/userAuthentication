@@ -7,7 +7,7 @@ const userRegister = async (req, res) => {
     await newUser.save();
     res
       .status(201)
-      .json({ message: " User successfully Registered", recipe: newRecipe });
+      .json({ message: " User successfully Registered", recipe: newUser });
   } catch (err) {
     res
       .status(500)
@@ -20,14 +20,16 @@ const userLogin = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (user) {
-      res.status(200).json(user);
+      res
+        .status(200)
+        .json({ message: " User successfully Login", recipe: user });
     } else {
-      res.status(404).json({ message: "Recipe not found" });
+      res.status(404).json({ message: "User not found" });
     }
   } catch (err) {
     res
       .status(500)
-      .json({ message: "Error fetching recipe", error: err.message });
+      .json({ message: "Error fetching user", error: err.message });
   }
 };
 
