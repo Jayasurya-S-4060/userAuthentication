@@ -7,11 +7,11 @@ const userRegister = async (req, res) => {
     await newUser.save();
     res
       .status(201)
-      .json({ message: "Recipe successfully created", recipe: newRecipe });
+      .json({ message: " User successfully Registered", recipe: newRecipe });
   } catch (err) {
     res
       .status(500)
-      .json({ message: "Error creating recipe", error: err.message });
+      .json({ message: "Error while Registering", error: err.message });
   }
 };
 
