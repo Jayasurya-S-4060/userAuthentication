@@ -1,8 +1,7 @@
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const resetRequest = require("../models/resetToken");
-const resetScheme = require("../models/resetToken");
+const resetpassword = require("../models/resetToken");
 
 // Create a new User
 const userRegister = async (req, res) => {
@@ -103,7 +102,7 @@ const resetPasswordRequest = async (req, res) => {
       expiresIn: "1h",
     });
 
-    const createRequest = new resetScheme({ userName, email, hash });
+    const createRequest = new resetpassword({ userName, email, hash });
 
     await createRequest.save();
 
