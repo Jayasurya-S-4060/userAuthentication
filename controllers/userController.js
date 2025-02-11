@@ -1,6 +1,8 @@
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const resetRequest = require("../models/resetToken");
+const resetScheme = require("../models/resetToken");
 
 // Create a new User
 const userRegister = async (req, res) => {
@@ -88,24 +90,35 @@ const resetPasswordRequest = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(email, salt);
+
     const { userName } = user;
     const JWT_SECRET = process.env.JWT_SECRET;
-    const resetToken = jwt.sign({ userName, email }, JWT_SECRET, {
+    if (!JWT_SECRET) {
+      return res.status(500).json({ message: "JWT secret is missing" });
+    }
+
+    const resetToken = jwt.sign({ userName, email, hash }, JWT_SECRET, {
       expiresIn: "1h",
     });
+
+    const createRequest = new resetScheme({ userName, email, hash });
+
+    await createRequest.save();
 
     const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.admin_mail,
-        pass: process.env.mail_password,
+        user: process.env.ADMIN_MAIL,
+        pass: process.env.MAIL_PASSWORD,
       },
     });
 
     const mailOptions = {
-      from: process.env.admin_mail,
+      from: process.env.ADMIN_MAIL,
       to: email,
       subject: "Password Reset Request",
       html: `<p>Hello ${userName},</p>
@@ -122,9 +135,10 @@ const resetPasswordRequest = async (req, res) => {
       resetLink,
     });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Server error", error: error.message });
+    return res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
 
