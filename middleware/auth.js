@@ -54,4 +54,28 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-module.exports = { registerAuth, loginAuth, verifyToken };
+const resetPasswordAuthRequest = (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    next();
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+module.exports = {
+  registerAuth,
+  loginAuth,
+  verifyToken,
+  resetPasswordAuthRequest,
+};

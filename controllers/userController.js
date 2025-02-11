@@ -75,8 +75,62 @@ const getUserInfo = async (req, res) => {
   }
 };
 
+const resetPasswordRequest = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const { userName } = user;
+    const JWT_SECRET = process.env.JWT_SECRET;
+    const resetToken = jwt.sign({ userName, email }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.admin_mail,
+        pass: process.env.mail_password,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.admin_mail,
+      to: email,
+      subject: "Password Reset Request",
+      html: `<p>Hello ${userName},</p>
+             <p>You requested a password reset. Click the link below to reset your password:</p>
+             <a href="${resetLink}">Reset Password</a>
+             <p>This link will expire in 1 hour.</p>
+             <p>If you did not request this, please ignore this email.</p>`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    return res.status(200).json({
+      message: "Password reset email sent successfully",
+      resetLink,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
+
 module.exports = {
   userRegister,
   userLogin,
   getUserInfo,
+  resetPasswordRequest,
 };
