@@ -2,6 +2,7 @@ const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const resetpassword = require("../models/resetToken");
+const nodemailer = require("nodemailer");
 
 // Create a new User
 const userRegister = async (req, res) => {
