@@ -97,7 +97,7 @@ const resetPasswordRequest = async (req, res) => {
       expiresIn: "1h",
     });
 
-    const createRequest = new resetpassword({ userName, email, hash });
+    const createRequest = new resetpassword({ email });
 
     await createRequest.save();
 
