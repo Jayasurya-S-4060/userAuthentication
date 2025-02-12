@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 const resetpassword = require("../models/resetToken");
 const nodemailer = require("nodemailer");
 
-// Create a new User
 const userRegister = async (req, res) => {
   try {
     const { userName, email, password } = req.body;
@@ -138,9 +137,41 @@ const resetPasswordRequest = async (req, res) => {
   }
 };
 
+const resetPassword = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password || password.length < 6) {
+      return res.status(400).json({
+        message:
+          "Invalid request. Ensure email is provided and password is at least 6 characters.",
+      });
+    }
+
+    const resetRequests = await ResetPassword.find({ email });
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+    await user.save();
+
+    await ResetPassword.deleteMany({ email });
+
+    res.json({ message: "Password reset successful. Please log in." });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 module.exports = {
   userRegister,
   userLogin,
   getUserInfo,
+  resetPassword,
   resetPasswordRequest,
 };

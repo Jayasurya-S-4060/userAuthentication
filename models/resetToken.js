@@ -4,9 +4,9 @@ const resetPasswordRequestSchema = mongoose.Schema({
   email: String,
 });
 
-const resetpassword = mongoose.model(
+const resetPasswordRequestModel = mongoose.model(
   "reset-password-request",
   resetPasswordRequestSchema
 );
 
-module.exports = resetpassword;
+module.exports = resetPasswordRequestModel;

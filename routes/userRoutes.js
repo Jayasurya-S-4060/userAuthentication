@@ -3,6 +3,7 @@ const {
   userRegister,
   userLogin,
   getUserInfo,
+  resetPassword,
   resetPasswordRequest,
 } = require("../controllers/userController");
 const {
@@ -10,12 +11,13 @@ const {
   loginAuth,
   verifyToken,
   resetPasswordAuthRequest,
+  resetPasswordAuth,
 } = require("../middleware/auth");
 
 const router = express.Router();
 
 router.post("/register", registerAuth, userRegister);
-router.post("/reset-password", resetPasswordAuthRequest, resetPasswordRequest);
+router.post("/reset-password", resetPasswordAuth, resetPassword);
 router.post(
   "/reset-password-request",
   resetPasswordAuthRequest,
