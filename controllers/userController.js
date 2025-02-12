@@ -95,9 +95,6 @@ const resetPasswordRequest = async (req, res) => {
 
     const { userName } = user;
     const JWT_SECRET = process.env.JWT_SECRET;
-    if (!JWT_SECRET) {
-      return res.status(500).json({ message: "JWT secret is missing" });
-    }
 
     const resetToken = jwt.sign({ userName, email, hash }, JWT_SECRET, {
       expiresIn: "1h",
@@ -107,7 +104,7 @@ const resetPasswordRequest = async (req, res) => {
 
     await createRequest.save();
 
-    const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
+    const resetLink = `${process.env.client_url}/confirm-password?token=${resetToken}`;
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
