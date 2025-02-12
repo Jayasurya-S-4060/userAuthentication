@@ -1,7 +1,7 @@
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const resetpassword = require("../models/resetToken");
+const resetTokenModel = require("../models/resetToken");
 const nodemailer = require("nodemailer");
 
 const userRegister = async (req, res) => {
@@ -96,7 +96,7 @@ const resetPasswordRequest = async (req, res) => {
       expiresIn: "1h",
     });
 
-    const createRequest = new resetpassword({ email });
+    const createRequest = new resetTokenModel({ email });
 
     await createRequest.save();
 
@@ -141,14 +141,7 @@ const resetPassword = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password || password.length < 6) {
-      return res.status(400).json({
-        message:
-          "Invalid request. Ensure email is provided and password is at least 6 characters.",
-      });
-    }
-
-    const resetRequests = await ResetPassword.find({ email });
+    const resetRequests = await resetTokenModel.find({ email });
 
     const user = await User.findOne({ email });
 
@@ -160,7 +153,7 @@ const resetPassword = async (req, res) => {
     user.password = await bcrypt.hash(password, salt);
     await user.save();
 
-    await ResetPassword.deleteMany({ email });
+    await resetTokenModel.deleteMany({ email });
 
     res.json({ message: "Password reset successful. Please log in." });
   } catch (error) {

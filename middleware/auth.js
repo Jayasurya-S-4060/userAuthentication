@@ -71,7 +71,9 @@ const resetPasswordAuth = (req, res, next) => {
         return res.status(403).json({ message: "Invalid or expired token" });
       }
 
-      req.user = decoded;
+      let decode = jwt.decode(token);
+      req.body.email = decode.email;
+
       next();
     });
   } catch (error) {
