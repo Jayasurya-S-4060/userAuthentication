@@ -90,13 +90,10 @@ const resetPasswordRequest = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(email, salt);
-
     const { userName } = user;
     const JWT_SECRET = process.env.JWT_SECRET;
 
-    const resetToken = jwt.sign({ userName, email, hash }, JWT_SECRET, {
+    const resetToken = jwt.sign({ email }, JWT_SECRET, {
       expiresIn: "1h",
     });
 
@@ -104,7 +101,9 @@ const resetPasswordRequest = async (req, res) => {
 
     await createRequest.save();
 
-    const resetLink = `${process.env.client_url}/confirm-password?token=${resetToken}`;
+    // process.env.client_url
+
+    const resetLink = `http://localhost:5173/confirm-password?token=${resetToken}`;
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
