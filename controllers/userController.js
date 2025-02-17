@@ -100,9 +100,7 @@ const resetPasswordRequest = async (req, res) => {
 
     await createRequest.save();
 
-    // process.env.client_url
-
-    const resetLink = `http://localhost:5173/confirm-password?token=${resetToken}`;
+    const resetLink = `${process.env.client_url}/confirm-password?token=${resetToken}`;
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
